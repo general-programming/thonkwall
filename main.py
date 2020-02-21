@@ -4,8 +4,12 @@ from thonk import config
 
 import os
 import sched
+import logging
 
 if __name__ == "__main__":
+	log_level = os.getenv("THONKWALL_LOG_LEVEL", logging.INFO)
+	logging.basicConfig(format="%(asctime)s [%(name)s %(levelname)s]: %(message)s", level=log_level)
+		
 	settings_path = os.getenv("THONKWALL_PROVIDERS", os.path.abspath("providers.ini"))
 
 	in_interface = os.getenv("THONKWALL_RULE_IN_INTERFACE", None)
@@ -16,6 +20,9 @@ if __name__ == "__main__":
 	
 	providers = config.get_providers(settings_path)
 	p = ProviderAggregator(*providers)
+
+	logging.info(f"thonkwall starting, {len(p.providers)} providers")
+	
 	p.update()
 
 	s = sched.scheduler()
@@ -31,4 +38,4 @@ if __name__ == "__main__":
 		except KeyboardInterrupt:
 			break
 
-	print("Shutting down!")
+	logging.info("Shutting down!")

@@ -1,9 +1,12 @@
 import iptc
+import logging
 
 from thonk.service import Service
 from typing import List
 
-__all__ = ["service_to_rule"]
+__all__ = ["IpTablesConsumer"]
+
+log = logging.getLogger(__name__)
 
 def service_to_rule(service: Service) -> iptc.Rule:
 	rule = iptc.Rule()
@@ -55,7 +58,7 @@ class IpTablesConsumer:
 		to_delete = [rule for rule in old_rules if rule not in new_rules]
 		to_add = [rule for rule in new_rules if rule not in old_rules]
 
-		print(f"+{len(to_add)} new rules, -{len(to_delete)} old rules")
+		log.debug(f"Updating iptables: {len(to_add)} added, {len(to_delete)} removed")
 
 		for r in to_delete:
 			self.chain.delete_rule(r)

@@ -1,8 +1,11 @@
 import consulate
+import logging
 
 from thonk.service import Provider, Service
 
 __all__ = ["ConsulServiceDiscovery"]
+
+log = logging.getLogger(__name__)
 
 def _tag_value(val: str):
 	ci_val = val.lower()
@@ -59,7 +62,11 @@ class ConsulServiceDiscovery(Provider):
 			if not tags.get("thonkwall.enable", False):
 				continue
 
-			service = self.consul.catalog.service(sid)[0]
+			try:
+				service = self.consul.catalog.service(sid)[0]
+			except IndexError:
+				log.warning(f"Service {sid} disappeared, skipping")
+				continue
 
 			name = service["ServiceName"] or sid
 			host = tags.get("thonkwall.host", service["ServiceAddress"] or service["Address"])
@@ -69,7 +76,7 @@ class ConsulServiceDiscovery(Provider):
 			local_service = Service(name, host, int(port), protocol)
 			rules.append(local_service)
 
-		print(f"Consul discovery: found {len(rules)} rules")
+		log.debug(f"Consul discovery: found {len(rules)} rules")
 		self.active_rules = rules
 		return rules
 	
