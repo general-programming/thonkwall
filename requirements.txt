@@ -1,0 +1,2 @@
+consulate==0.6.0
+python-iptables==0.14.0

@@ -1,0 +1,6 @@
+# Python bits
+__pycache__/
+env/
+
+# Project-specific
+providers.ini
