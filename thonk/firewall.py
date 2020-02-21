@@ -28,7 +28,7 @@ class IpTablesConsumer:
 		self.chain = iptc.Chain(self.table, CHAIN_NAME)
 
 		self.rule_in_interface = in_interface
- 		self.rule_dst_addr = dst_addr
+		self.rule_dst_addr = dst_addr
 
 		if not self.table.is_chain(self.chain):
 			self.table.create_chain(self.chain)
