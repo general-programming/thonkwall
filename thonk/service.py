@@ -1,11 +1,11 @@
 from abc import ABCMeta, abstractmethod
-from typing import List
+from typing import List, Iterator
 from itertools import chain
 
 __all__ = ["Service", "Provider", "ProviderAggregator"]
 
 class Service:
-	def __init__(self, name: str, dst_host: str, port: int, protocol: str="tcp"):
+	def __init__(self, name: str, dst_host: str, port: int, protocol: str = "tcp"):
 		self.name = name
 		self.host = dst_host
 		self.port = port
@@ -26,7 +26,7 @@ class Provider(metaclass=ABCMeta):
 
 class ProviderAggregator(Provider):
 	def __init__(self, *providers):
-		self.providers = providers
+		self.providers = list(providers)
 
 	def add_provider(self, provider):
 		self.providers.append(provider)
@@ -35,7 +35,7 @@ class ProviderAggregator(Provider):
 		for p in self.providers:
 			p.update()
 
-	def get_active_rules(self) -> List[Service]:
+	def get_active_rules(self) -> Iterator:
 		return chain.from_iterable(
 			map(lambda p: p.get_active_rules(), self.providers)
 		)
